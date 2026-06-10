@@ -1,0 +1,8 @@
+stack_name: digital-ai-site
+service_name: web
+
+domains:
+  - digital-ai.tech
+
+dockerfile: Dockerfile
+run_tests: false

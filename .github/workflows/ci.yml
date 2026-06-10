@@ -1,0 +1,15 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: DIGITAL-AI-TECH/workflows/.github/workflows/deploy-swarm.yml@main
+    with:
+      app_name: digital-ai-site
+      stack_name: digital-ai-site
+      service_name: web
+    secrets: inherit

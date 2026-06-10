@@ -1108,8 +1108,10 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(8, 11, 26, 0.97);
-      z-index: 99;
+      background: rgba(8, 11, 26, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 200;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -1125,14 +1127,28 @@
       transition: color 0.2s;
     }
     .mobile-menu a:hover { color: var(--text-primary); }
+    .mobile-menu-cta {
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, #2D52EF, #3B2FC9);
+      color: #fff !important;
+      padding: 0.875rem 2rem;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+    }
     .mobile-close {
       position: absolute;
       top: 1.5rem; right: 1.5rem;
-      background: none; border: none;
-      color: var(--text-muted);
+      background: rgba(30, 34, 69, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
       cursor: pointer;
-      font-size: 1.5rem;
-      padding: 0.5rem;
+      font-size: 1.25rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
     }
   </style>
 </head>
@@ -1174,7 +1190,7 @@
     <a href="#services" onclick="closeMobile()">Serviços</a>
     <a href="#howitworks" onclick="closeMobile()">Como funciona</a>
     <a href="#differentials" onclick="closeMobile()">Diferenciais</a>
-    <a href="https://wa.me/5564981337424" class="btn-whatsapp" target="_blank" rel="noopener">Falar no WhatsApp</a>
+    <a href="https://wa.me/5564981337424" class="mobile-menu-cta" target="_blank" rel="noopener" onclick="closeMobile()">Falar com especialista</a>
   </div>
 
   <!-- ─── Hero ─── -->

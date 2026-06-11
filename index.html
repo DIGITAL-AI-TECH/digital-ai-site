@@ -47,6 +47,8 @@
       --font-body: 'DM Sans', sans-serif;
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
       --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --fast: cubic-bezier(0.4, 0, 1, 1);
+      --shadow-hover: 0 16px 40px rgba(0,0,0,0.35), 0 4px 12px rgba(45,82,239,0.12);
     }
 
     /* ─── Scrollbar ─── */
@@ -1016,14 +1018,32 @@
       transform: translateY(24px);
       transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
     }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .reveal-from-left {
+      opacity: 0;
+      transform: translateX(-32px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
     }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-from-right {
+      opacity: 0;
+      transform: translateX(32px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.75s var(--ease), transform 0.75s var(--spring);
+    }
+    .reveal.visible,
+    .reveal-from-left.visible,
+    .reveal-from-right.visible,
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-delay-1 { transition-delay: 0.12s; }
+    .reveal-delay-2 { transition-delay: 0.24s; }
+    .reveal-delay-3 { transition-delay: 0.36s; }
+    .reveal-delay-4 { transition-delay: 0.48s; }
 
     /* ─── Responsive ─── */
 
@@ -1105,28 +1125,43 @@
 
     /* ─── Mobile menu ─── */
     .mobile-menu {
-      display: none;
       position: fixed;
       inset: 0;
       background: rgba(8, 11, 26, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       z-index: 200;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 2rem;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
     }
-    .mobile-menu.open { display: flex; }
+    .mobile-menu.open {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: all;
+    }
     .mobile-menu a {
       font-family: var(--font-display);
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--text-secondary);
       text-decoration: none;
-      transition: color 0.2s;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), color 0.2s;
     }
     .mobile-menu a:hover { color: var(--text-primary); }
+    .mobile-menu.open a { opacity: 1; transform: none; }
+    .mobile-menu.open a:nth-child(2) { transition-delay: 0.10s; }
+    .mobile-menu.open a:nth-child(3) { transition-delay: 0.20s; }
+    .mobile-menu.open a:nth-child(4) { transition-delay: 0.30s; }
+    .mobile-menu.open a:nth-child(5) { transition-delay: 0.40s; }
     .mobile-menu-cta {
       margin-top: 0.5rem;
       background: linear-gradient(135deg, #2D52EF, #3B2FC9);
@@ -1149,6 +1184,174 @@
       font-size: 1.25rem;
       width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s var(--ease) 0.45s, transform 0.3s var(--spring) 0.45s;
+    }
+    .mobile-menu.open .mobile-close { opacity: 1; transform: none; }
+    /* Hamburger X morphing */
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ─── Keyframes ─── */
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: scale(0.92) translateY(12px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes ctaBreath {
+      0%, 100% { box-shadow: 0 12px 32px rgba(45,82,239,0.35); }
+      50%       { box-shadow: 0 18px 48px rgba(45,82,239,0.55), 0 0 0 6px rgba(45,82,239,0.08); }
+    }
+    @keyframes diffGlow {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50%       { opacity: 1; transform: scale(1.15); }
+    }
+
+    /* ─── Hero: entry animations ─── */
+    .hero-badge    { animation: heroIn 0.6s var(--ease) 0.10s both; }
+    .hero-title    { animation: heroIn 0.7s var(--ease) 0.25s both; }
+    .hero-subtitle { animation: heroIn 0.7s var(--ease) 0.45s both; }
+    .hero-actions  { animation: heroIn 0.7s var(--ease) 0.60s both; }
+    .hero-visual   { animation: heroIn 0.9s var(--ease) 0.55s both; }
+    .floating-card-1 {
+      animation: cardEntrance 0.8s var(--spring) 0.80s both,
+                 floatCard1 6s ease-in-out 1.60s infinite;
+    }
+    .floating-card-2 {
+      animation: cardEntrance 0.8s var(--spring) 1.00s both,
+                 floatCard2 7s ease-in-out 2.00s infinite;
+    }
+
+    /* ─── Steps: staggered entrance ─── */
+    .steps .step {
+      opacity: 0;
+      transform: translateY(20px) scale(0.96);
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--spring);
+    }
+    .steps.steps-visible .step { opacity: 1; transform: none; }
+    .steps.steps-visible .step:nth-child(1) { transition-delay: 0.00s; }
+    .steps.steps-visible .step:nth-child(2) { transition-delay: 0.12s; }
+    .steps.steps-visible .step:nth-child(3) { transition-delay: 0.24s; }
+    .steps.steps-visible .step:nth-child(4) { transition-delay: 0.36s; }
+
+    /* ─── Sector chips: staggered entrance ─── */
+    .sector-chips--stagger .chip {
+      opacity: 0;
+      transform: translateY(10px) scale(0.88);
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--spring),
+                  border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .sector-chips--stagger.chips-visible .chip { opacity: 1; transform: none; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(1) { transition-delay: 0.00s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(2) { transition-delay: 0.07s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(3) { transition-delay: 0.14s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(4) { transition-delay: 0.21s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(5) { transition-delay: 0.28s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(6) { transition-delay: 0.35s; }
+    .sector-chips--stagger.chips-visible .chip:nth-child(7) { transition-delay: 0.42s; }
+
+    /* ─── Nav: active underline ─── */
+    .nav-links a { position: relative; }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 100%; height: 2px;
+      background: var(--precisao);
+      border-radius: 1px;
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.3s var(--ease);
+    }
+    .nav-links a.active { color: var(--text-primary); }
+    .nav-links a.active::after { transform: scaleX(1); }
+
+    /* ─── Bento card: improved hover ─── */
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* ─── Diff card: improved hover ─── */
+    .diff-card:hover .diff-number {
+      background: linear-gradient(135deg, #2D52EF 0%, #3B2FC9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .diff-card:hover .diff-glow {
+      opacity: 1;
+      filter: blur(24px);
+      animation: diffGlow 2.5s ease-in-out infinite;
+    }
+
+    /* ─── Problem icon: hover micro ─── */
+    .problem-icon { transition: all 0.25s var(--spring); }
+    .problem-item:hover .problem-icon {
+      transform: scale(1.15) rotate(-5deg);
+      background: rgba(45, 82, 239, 0.18);
+      border-color: rgba(45, 82, 239, 0.4);
+    }
+
+    /* ─── Footer: social hover ─── */
+    .footer-social a { transition: all 0.25s var(--spring); }
+    .footer-social a:hover {
+      border-color: rgba(45, 82, 239, 0.5);
+      color: var(--text-primary);
+      background: rgba(45, 82, 239, 0.12);
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 6px 16px rgba(45,82,239,0.25);
+    }
+
+    /* ─── CTA button: breath animation ─── */
+    #cta .btn-whatsapp:not(:hover) { animation: ctaBreath 3s ease-in-out 2s infinite; }
+
+    /* ─── Buttons: :active + :focus-visible ─── */
+    .btn-primary:active  { transform: translateY(-1px) scale(0.98); }
+    .btn-ghost:active    { transform: scale(0.98); }
+    .btn-whatsapp:active { transform: translateY(-1px) scale(0.98); }
+    .bento-card:active   { transform: translateY(-2px); }
+    .diff-card:active    { transform: translateY(-2px); }
+    .btn-primary:focus-visible,
+    .btn-ghost:focus-visible,
+    .btn-whatsapp:focus-visible,
+    .nav-cta:focus-visible,
+    .hamburger:focus-visible,
+    .mobile-close:focus-visible {
+      outline: 2px solid var(--precisao);
+      outline-offset: 3px;
+    }
+    .bento-card:focus-visible,
+    .diff-card:focus-visible {
+      outline: 2px solid var(--precisao);
+      outline-offset: 2px;
+    }
+
+    /* ─── prefers-reduced-motion ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .hero-badge, .hero-title, .hero-subtitle,
+      .hero-actions, .hero-visual,
+      .floating-card-1, .floating-card-2 {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .reveal, .reveal-from-left, .reveal-from-right, .reveal-scale,
+      .steps .step, .sector-chips--stagger .chip {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
@@ -1204,15 +1407,15 @@
     <div class="container">
       <div class="hero-inner">
         <div class="hero-content">
-          <div class="hero-badge reveal">Dados, IA e Automação para Empresas</div>
-          <h1 class="display display-lg hero-title reveal reveal-delay-1">
+          <div class="hero-badge">Dados, IA e Automação para Empresas</div>
+          <h1 class="display display-lg hero-title">
             Transformamos complexidade em<br>
             <span class="gradient-text">lucro, eficiência e escala.</span>
           </h1>
-          <p class="hero-subtitle reveal reveal-delay-2">
+          <p class="hero-subtitle">
             Combinamos Inteligência Artificial, Automação e Dados para eliminar gargalos operacionais, otimizar processos e acelerar o crescimento de empresas que buscam mais eficiência, previsibilidade e resultado.
           </p>
-          <div class="hero-actions reveal reveal-delay-3">
+          <div class="hero-actions">
             <a href="https://wa.me/5564981337424" class="btn-primary" target="_blank" rel="noopener">
               <span>Quero identificar oportunidades</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1316,7 +1519,7 @@
         </div>
       </div>
       <div class="problem-grid">
-        <div class="problem-item reveal reveal-delay-1">
+        <div class="problem-item reveal-from-left reveal-delay-1">
           <div class="problem-icon">⏱️</div>
           <div>
             <div class="problem-item-title">Processos lentos</div>
@@ -1330,7 +1533,7 @@
             <div class="problem-item-desc">Sem integração entre dados, sistemas e processos, oportunidades passam despercebidas e decisões se tornam menos eficientes.</div>
           </div>
         </div>
-        <div class="problem-item reveal reveal-delay-3">
+        <div class="problem-item reveal-from-right reveal-delay-3">
           <div class="problem-icon">🔁</div>
           <div>
             <div class="problem-item-title">Operações difíceis de escalar</div>
@@ -1453,22 +1656,22 @@
         </h2>
       </div>
       <div class="steps">
-        <div class="step reveal">
+        <div class="step">
           <div class="step-number-wrap"><span class="step-number">01</span></div>
           <h3 class="step-title">Diagnóstico</h3>
           <p class="step-desc">Mapeamos processos, identificamos gargalos e descobrimos oportunidades de melhoria capazes de gerar impacto real no negócio.</p>
         </div>
-        <div class="step reveal reveal-delay-1">
+        <div class="step">
           <div class="step-number-wrap"><span class="step-number">02</span></div>
           <h3 class="step-title">Arquitetura</h3>
           <p class="step-desc">Desenhamos uma solução personalizada combinando IA, automação e integração de dados alinhadas aos seus objetivos.</p>
         </div>
-        <div class="step reveal reveal-delay-2">
+        <div class="step">
           <div class="step-number-wrap"><span class="step-number">03</span></div>
           <h3 class="step-title">Implementação</h3>
           <p class="step-desc">Desenvolvemos, validamos e refinamos cada fluxo para garantir estabilidade, desempenho e aderência operacional.</p>
         </div>
-        <div class="step reveal reveal-delay-3">
+        <div class="step">
           <div class="step-number-wrap"><span class="step-number">04</span></div>
           <h3 class="step-title">Evolução</h3>
           <p class="step-desc">Monitoramos resultados, identificamos novas oportunidades e evoluímos continuamente a solução para acompanhar o crescimento da empresa.</p>
@@ -1526,7 +1729,7 @@
         <h2 class="display display-sm reveal reveal-delay-1" style="text-align:center">
           Experiência em operações complexas e<br><span class="gradient-text">ambientes de alta demanda.</span>
         </h2>
-        <div class="sector-chips reveal reveal-delay-2">
+        <div class="sector-chips sector-chips--stagger">
           <span class="chip">🏥 Saúde</span>
           <span class="chip">🎓 Educação</span>
           <span class="chip">🏠 Imobiliário</span>
@@ -1542,7 +1745,7 @@
   <!-- ─── CTA ─── -->
   <section id="cta">
     <div class="container">
-      <div class="cta-box reveal">
+      <div class="cta-box reveal-scale">
         <div class="cta-orb-1"></div>
         <div class="cta-orb-2"></div>
         <h2 class="display display-md">
@@ -1658,12 +1861,21 @@
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileClose = document.getElementById('mobileClose');
-    hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
-    mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
-    function closeMobile() { mobileMenu.classList.remove('open'); }
+    hamburgerBtn.addEventListener('click', () => {
+      mobileMenu.classList.add('open');
+      hamburgerBtn.classList.add('active');
+    });
+    mobileClose.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      hamburgerBtn.classList.remove('active');
+    });
+    function closeMobile() {
+      mobileMenu.classList.remove('open');
+      hamburgerBtn.classList.remove('active');
+    }
 
     // ─── Reveal on scroll
-    const revealEls = document.querySelectorAll('.reveal');
+    const revealEls = document.querySelectorAll('.reveal, .reveal-from-left, .reveal-from-right, .reveal-scale');
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1673,6 +1885,42 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     revealEls.forEach(el => revealObserver.observe(el));
+
+    // ─── Steps: stagger on scroll
+    const stepsEl = document.querySelector('.steps');
+    if (stepsEl) {
+      new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            stepsEl.classList.add('steps-visible');
+          }
+        });
+      }, { threshold: 0.15 }).observe(stepsEl);
+    }
+
+    // ─── Sector chips: stagger on scroll
+    const chipsEl = document.querySelector('.sector-chips--stagger');
+    if (chipsEl) {
+      new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) chipsEl.classList.add('chips-visible');
+        });
+      }, { threshold: 0.25 }).observe(chipsEl);
+    }
+
+    // ─── Nav: active section highlight
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+    const sections = document.querySelectorAll('section[id]');
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.4 });
+    sections.forEach(s => sectionObserver.observe(s));
 
     // ─── Counter animation
     function animateCounter(el) {
@@ -1737,7 +1985,16 @@
           el.classList.add('visible');
         }
       });
-    }, 100);
+      // Also trigger steps/chips if already visible
+      if (stepsEl) {
+        const r = stepsEl.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.9) stepsEl.classList.add('steps-visible');
+      }
+      if (chipsEl) {
+        const r = chipsEl.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.9) chipsEl.classList.add('chips-visible');
+      }
+    }, 120);
   </script>
 </body>
 </html>

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 OG Image 1200x630 — Digital AI
-Layout adapted from linkedin-cover.svg identity
 """
 from PIL import Image, ImageDraw, ImageFont
 import math
@@ -12,7 +11,7 @@ W, H = 1200, 630
 try:
     f_bold    = ImageFont.truetype("/tmp/PlusJakartaSans-Bold.ttf", 80)
     f_xbold   = ImageFont.truetype("/tmp/PlusJakartaSans-ExtraBold.ttf", 82)
-    f_tag     = ImageFont.truetype("/tmp/PlusJakartaSans-Bold.ttf", 15)
+    f_wordmark = ImageFont.truetype("/tmp/PlusJakartaSans-Bold.ttf", 26)
     f_body    = ImageFont.truetype("/tmp/DMSans-Regular.ttf", 22)
     f_body_sm = ImageFont.truetype("/tmp/DMSans-Regular.ttf", 18)
     f_url     = ImageFont.truetype("/tmp/PlusJakartaSans-Bold.ttf", 17)
@@ -29,7 +28,7 @@ c3 = (59, 47, 201)   # #3B2FC9
 
 for y in range(H):
     for x in range(W):
-        t = (x / W * 0.6 + y / H * 0.4)   # diagonal blend
+        t = (x / W * 0.6 + y / H * 0.4)
         if t < 0.45:
             tt = t / 0.45
             r = int(c1[0] + (c2[0] - c1[0]) * tt)
@@ -45,7 +44,6 @@ for y in range(H):
 draw = ImageDraw.Draw(img)
 
 # ── Diamond shapes — right side ──────────────────────────────────────────
-# Scale from 1584x396 → 1200x630: factor_x=0.757, factor_y=1.591
 fx, fy = 1200/1584, 630/396
 
 def scale_pts(pts):
@@ -65,49 +63,45 @@ od.polygon(d3, fill=(255,255,255,7))
 img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
 draw = ImageDraw.Draw(img)
 
-# ── Top-left tag: blue dot + "DIGITAL-AI.TECH" ───────────────────────────
-tag_x, tag_y = 72, 44
-draw.ellipse([tag_x, tag_y + 1, tag_x + 8, tag_y + 9], fill=(45, 82, 239))
-draw.text((tag_x + 18, tag_y - 2), "DIGITAL-AI.TECH",
-          fill=(255, 255, 255, 209), font=f_tag)
+# ── Top-left logo: D icon (white) + "Digital AI" wordmark ────────────────
+logo_src = Image.open(
+    "/cortex/files/identity-engine/digital-ai/logos/png/favicon-32.png"
+).convert("RGBA")
 
-# ── Top-right: D logo favicon (matching identity) ────────────────────────
-# Position so it stays inside the canvas
-ico_x, ico_y = 1100, 34
-ico_w, ico_h = 54, 60
+# Recolor every non-transparent pixel to white
+logo_size = 52
+logo = logo_src.resize((logo_size, logo_size), Image.LANCZOS)
+pixels = logo.load()
+for py in range(logo.height):
+    for px in range(logo.width):
+        r, g, b, a = pixels[px, py]
+        if a > 30:
+            pixels[px, py] = (255, 255, 255, a)
 
-# Background pill
-draw.rounded_rectangle(
-    [ico_x, ico_y, ico_x + ico_w, ico_y + ico_h],
-    radius=10, fill=(45, 82, 239, 210)
-)
-# Left vertical bar of D
-draw.rectangle(
-    [ico_x + 10, ico_y + 10, ico_x + 20, ico_y + ico_h - 10],
-    fill=(255, 255, 255)
-)
-# D right arc fill
-draw.rounded_rectangle(
-    [ico_x + 16, ico_y + 10, ico_x + ico_w - 8, ico_y + ico_h - 10],
-    radius=9, fill=(255, 255, 255)
-)
-# Punch arc center
-draw.ellipse(
-    [ico_x + 24, ico_y + 18, ico_x + ico_w - 10, ico_y + ico_h - 18],
-    fill=(45, 82, 239, 210)
+logo_x, logo_y = 64, 36
+img_rgba = img.convert("RGBA")
+img_rgba.paste(logo, (logo_x, logo_y), logo)
+img = img_rgba.convert("RGB")
+draw = ImageDraw.Draw(img)
+
+# "Digital AI" wordmark next to logo
+draw.text(
+    (logo_x + logo_size + 14, logo_y + (logo_size // 2) - 14),
+    "Digital AI",
+    fill=(255, 255, 255),
+    font=f_wordmark
 )
 
-# ── Separator line top ────────────────────────────────────────────────────
-draw.line([(72, 95), (200, 95)], fill=(45, 82, 239), width=3)
+# ── Separator line below header ───────────────────────────────────────────
+draw.line([(64, logo_y + logo_size + 16), (220, logo_y + logo_size + 16)],
+          fill=(45, 82, 239), width=2)
 
 # ── Main headline — "O crescimento tem" ──────────────────────────────────
 headline1 = "O crescimento tem"
 headline2 = "método."
 
-h1_y = 160
+h1_y = 170
 draw.text((72, h1_y), headline1, fill=(255, 255, 255), font=f_bold)
-
-# "método." in ExtraBold #E8EEFF (slightly blue-white, italic feel via color)
 draw.text((72, h1_y + 92), headline2, fill=(232, 238, 255), font=f_xbold)
 
 # ── Body text ─────────────────────────────────────────────────────────────
@@ -121,7 +115,6 @@ draw.text((72, body_y + 28),
 
 # ── Separator line before body ────────────────────────────────────────────
 line_y = body_y - 16
-# Gradient line (approx — draw in segments)
 for x in range(72, 380):
     t = (x - 72) / (380 - 72)
     if t < 0.35:
